@@ -10,7 +10,7 @@ const generateCode = async (request, response, next) => {
     }
 
     cloudinary.uploader.upload(
-        `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${alias}`, 
+        `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://freshqr.io/${alias}`, 
         (err, cloudinaryResult) => {
             if (err) {
                 return response.status(400).json({ 'message' : 'Error saving QR code' });
