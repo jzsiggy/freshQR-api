@@ -1,8 +1,20 @@
 const mongoose = require('mongoose');
-const { QRCode } = require('../../model');
+const { User , QRCode } = require('../../model');
 
 const updateCode = async (request, response, next) => {
     const { id , name , content } = request.body;
+
+    const userID = request.session.user._id;
+    const currentUser = await User.findById(userID);
+    let { codes } = currentUser;
+    if ( !codes.includes(id) ) {
+        return response.status(400).json({ 'message' : 'Current user is not owner of QR code' })
+    }
+
+    let hasEmptyFields = [id , name , content].some(value => !value);
+    if (hasEmptyFields) {
+        return response.status(400).json({ 'message' : 'Missing field inputs' })
+    }
 
     const isValidID = mongoose.Types.ObjectId.isValid(id);
     if (!isValidID) {
