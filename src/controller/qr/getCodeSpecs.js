@@ -6,11 +6,14 @@ const getCodeSpecs = (request, response, next) => {
 
     QRCode.findOne({ alias })
     .then(queryResult => {
+        if (!queryResult) { return response.status(400).json({ 'message' : 'Alias not registered on database' }) }
         if (queryResult.owner != userID) { return response.status(400).json({ 'message' : 'Current user is not owner of QR code' }) }
-        if (queryResult) { return response.status(200).json(queryResult) }
-        return response.status(400).json({ 'message' : 'Alias not registered on database' })
+        return response.status(200).json(queryResult)
     })
-    .catch(err => response.status(400).json({ 'message' : 'Unable to reach database' }))
+    .catch(err => {
+        console.log(err)
+        response.status(400).json({ 'message' : "We've encountered a server error. Please try again localStorage." })
+    })
 }
 
 module.exports = {

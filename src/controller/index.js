@@ -11,7 +11,8 @@ const {
     authenticate,
     login,
     logout,
-    signup
+    signup,
+    getUser
 } = require('./auth');
 
 module.exports = {
@@ -25,5 +26,6 @@ module.exports = {
     authenticate,
     login,
     logout,
-    signup
+    signup,
+    getUser
 };

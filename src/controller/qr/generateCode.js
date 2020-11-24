@@ -48,7 +48,7 @@ const generateCode = async (request, response, next) => {
 
                 await session.commitTransaction();
                 session.endSession();
-                return response.status(200).json(newCode)
+                return response.status(200).json(newCode[0])
             }
 
             catch {
