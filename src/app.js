@@ -21,7 +21,7 @@ app.use(bodyParser.urlencoded({ extended : false }));
 app.use(bodyParser.json());
 
 app.use(cors({
-    origin: process.env.PORT,
+    origin: process.env.CLIENT_URL,
     credentials: true
 }))
 
