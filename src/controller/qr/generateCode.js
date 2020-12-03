@@ -11,13 +11,17 @@ const generateCode = async (request, response, next) => {
         return response.status(400).json({ 'message' : 'Missing field inputs' })
     }
 
+    if (!content.startsWith('http://') && !content.startsWith('https://')) {       
+        return response.status(400).json({ 'message' : `url must start with 'http://' or 'https://'` })
+    }
+
     let codeRegistered = await QRCode.find({ alias });
     if (codeRegistered.length) {
         return response.status(400).json({ 'message' : 'Alias already exists in database' });
     }
 
     cloudinary.uploader.upload(
-        `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://freshqr.io/${alias}`, 
+        `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://freshqr.io/code/${alias}`, 
         async (err, cloudinaryResult) => {
             if (err) {
                 return response.status(400).json({ 'message' : 'Error saving QR code' });

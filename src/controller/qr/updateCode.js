@@ -16,6 +16,10 @@ const updateCode = async (request, response, next) => {
         return response.status(400).json({ 'message' : 'Missing field inputs' })
     }
 
+    if (!content.startsWith('http://') && !content.startsWith('https://')) {       
+        return response.status(400).json({ 'message' : `url must start with 'http://' or 'https://'` })
+    }
+
     const isValidID = mongoose.Types.ObjectId.isValid(id);
     if (!isValidID) {
         return response.status(400).json({ 'message' : 'Invalid ID sent by client' })
