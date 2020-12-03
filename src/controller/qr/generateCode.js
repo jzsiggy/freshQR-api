@@ -27,6 +27,8 @@ const generateCode = async (request, response, next) => {
                 return response.status(400).json({ 'message' : 'Error saving QR code' });
             };
 
+            console.log(cloudinaryResult)
+
             const db = mongoose.connection;
             const session = await db.startSession();
             session.startTransaction();
@@ -37,7 +39,7 @@ const generateCode = async (request, response, next) => {
                         name, 
                         alias, 
                         content,
-                        image: cloudinaryResult.url,
+                        image: cloudinaryResult.secure_url,
                         owner: userID
                     }],
                     { session: session }
