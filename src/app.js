@@ -26,8 +26,7 @@ app.use(cors({
 }))
 
 const { codeRouter } = require('./route');
-const { authenticate } = require('./controller');
-app.use('/api/qr', authenticate, codeRouter);
+app.use('/api/qr', codeRouter);
 
 const { authRouter } = require('./route');
 app.use('/api/auth', authRouter);

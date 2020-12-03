@@ -1,14 +1,15 @@
 const express = require('express');
 const codeRouter = express.Router();
 
-const { generateCode , deleteCode , getCodes , getCodeContent , getCodeSpecs , updateCode } = require('../controller');
+const { generateCode , deleteCode , getCodes , getCodeContent , getCodeSpecs , updateCode , authenticate } = require('../controller');
 
-codeRouter.post('/new', generateCode);
-codeRouter.post('/delete', deleteCode);
-codeRouter.get('/list', getCodes);
-codeRouter.post('/update', updateCode);
+
+codeRouter.post('/new', authenticate, generateCode);
+codeRouter.post('/delete', authenticate, deleteCode);
+codeRouter.get('/list', authenticate, getCodes);
+codeRouter.post('/update', authenticate, updateCode);
+codeRouter.get('/specs/:alias', authenticate, getCodeSpecs);
 codeRouter.get('/content/:alias', getCodeContent);
-codeRouter.get('/specs/:alias', getCodeSpecs);
 
 module.exports = {
     codeRouter
