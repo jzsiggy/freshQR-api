@@ -29,28 +29,16 @@ module.exports = {
         await qrcodes.createIndex({ owner: 1, folder: 1 });
         await folders.createIndex({ owner: 1 });
 
-        // 3. Unique alias for the public redirect — but only if data is clean.
-        const duplicates = await qrcodes.aggregate([
-            { $group: { _id: '$alias', n: { $sum: 1 } } },
-            { $match: { n: { $gt: 1 } } },
-        ]).toArray();
-
-        if (duplicates.length) {
-            throw new Error(
-                'Cannot create unique alias index — duplicate aliases exist: ' +
-                duplicates.map(d => `${d._id} (x${d.n})`).join(', ') +
-                '. Resolve duplicates and re-run.'
-            );
-        }
-
-        await qrcodes.createIndex({ alias: 1 }, { unique: true });
+        // NOTE: the unique { alias } index is intentionally NOT created here.
+        // Production has duplicate aliases that must be resolved first; that
+        // hardening ships separately once the data is clean (see the
+        // "unique-alias" follow-up migration).
     },
 
     async down(db) {
         const qrcodes = db.collection('qrcodes');
         const folders = db.collection('folders');
 
-        await dropIndexIfExists(qrcodes, 'alias_1');
         await dropIndexIfExists(qrcodes, 'owner_1_folder_1');
         await dropIndexIfExists(folders, 'owner_1');
 
