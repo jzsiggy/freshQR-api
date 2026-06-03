@@ -1,10 +1,11 @@
-const { 
+const {
     deleteCode,
     generateCode,
     getCodes,
     getCodeContent,
     getCodeSpecs,
-    updateCode 
+    updateCode,
+    moveCode
 } = require('./qr');
 
 const {
@@ -15,6 +16,13 @@ const {
     getUser
 } = require('./auth');
 
+const {
+    createFolder,
+    getFolders,
+    updateFolder,
+    deleteFolder
+} = require('./folder');
+
 module.exports = {
     deleteCode,
     generateCode,
@@ -22,10 +30,16 @@ module.exports = {
     getCodeContent,
     getCodeSpecs,
     updateCode,
+    moveCode,
 
     authenticate,
     login,
     logout,
     signup,
-    getUser
+    getUser,
+
+    createFolder,
+    getFolders,
+    updateFolder,
+    deleteFolder
 };

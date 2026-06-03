@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
-const { User , QRCode } = require('../../model');
+const { User , QRCode , Folder } = require('../../model');
 
 const updateCode = async (request, response, next) => {
-    const { id , name , content } = request.body;
+    const { id , name , content , folder } = request.body;
 
     const userID = request.session.user._id;
     const currentUser = await User.findById(userID);
@@ -35,6 +35,23 @@ const updateCode = async (request, response, next) => {
     }
     if (content) {
         code.content = content
+    }
+
+    // Optional: move the code into / out of a folder.
+    if ('folder' in request.body) {
+        if (folder) {
+            if (!mongoose.Types.ObjectId.isValid(folder)) {
+                return response.status(400).json({ 'message' : 'Invalid folder ID sent by client' })
+            }
+            const target = await Folder.findById(folder);
+            if (!target || target.owner != userID) {
+                return response.status(400).json({ 'message' : 'Current user is not owner of folder' })
+            }
+            code.folder = folder
+        }
+        else {
+            code.folder = null
+        }
     }
 
     let queryResult = await code.save()

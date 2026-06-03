@@ -1,0 +1,36 @@
+version: "3.8"
+
+services:
+  api:
+    build: .
+    env_file:
+      - .env
+    ports:
+      - "${PORT}:${PORT}"
+    depends_on:
+      mongo:
+        condition: service_healthy
+    restart: unless-stopped
+
+  mongo:
+    image: mongo:4.4
+    # Run as a single-node replica set so the QR generation transactions work.
+    command: ["--replSet", "rs0", "--bind_ip_all"]
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      # Initiate the replica set once mongod is up, then report healthy.
+      # rs.status() returns { ok: 0 } (it does not throw) until initiated, so we
+      # gate on .ok. The member host must match the address the API connects to
+      # ("mongo"), or the primary is advertised under an unresolvable hostname.
+      test: >
+        mongo --quiet --eval "rs.status().ok || rs.initiate({ _id: 'rs0', members: [{ _id: 0, host: 'mongo:27017' }] }).ok"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+volumes:
+  mongo-data:

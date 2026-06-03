@@ -1,9 +1,9 @@
 const cloudinary = require('cloudinary').v2
 const mongoose = require('mongoose');
-const { QRCode , User } = require('../../model');
+const { QRCode , User , Folder } = require('../../model');
 
 const generateCode = async (request, response, next) => {
-    const { name , alias , content } = request.body;
+    const { name , alias , content , folder } = request.body;
     const userID = request.session.user._id;
 
     let hasEmptyFields = [name , alias , content].some(value => !value);
@@ -11,8 +11,19 @@ const generateCode = async (request, response, next) => {
         return response.status(400).json({ 'message' : 'Missing field inputs' })
     }
 
-    if (!content.startsWith('http://') && !content.startsWith('https://')) {       
+    if (!content.startsWith('http://') && !content.startsWith('https://')) {
         return response.status(400).json({ 'message' : `url must start with 'http://' or 'https://'` })
+    }
+
+    // Optional: create the code already inside a folder the user owns.
+    if (folder) {
+        if (!mongoose.Types.ObjectId.isValid(folder)) {
+            return response.status(400).json({ 'message' : 'Invalid folder ID sent by client' })
+        }
+        const target = await Folder.findById(folder);
+        if (!target || target.owner != userID) {
+            return response.status(400).json({ 'message' : 'Current user is not owner of folder' })
+        }
     }
 
     let codeRegistered = await QRCode.find({ alias });
@@ -36,11 +47,12 @@ const generateCode = async (request, response, next) => {
             try {
                 let newCode = await QRCode.create(
                     [{
-                        name, 
-                        alias, 
+                        name,
+                        alias,
                         content,
                         image: cloudinaryResult.secure_url,
-                        owner: userID
+                        owner: userID,
+                        folder: folder || null
                     }],
                     { session: session }
                 )

@@ -31,6 +31,9 @@ app.use('/api/qr', codeRouter);
 const { authRouter } = require('./route');
 app.use('/api/auth', authRouter);
 
-app.listen(process.env.PORT, 
+const { folderRouter } = require('./route');
+app.use('/api/folder', folderRouter);
+
+app.listen(process.env.PORT,
     () => console.log(`Listening for connections on port ${process.env.PORT}`)
 );
